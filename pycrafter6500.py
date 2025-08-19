@@ -35,6 +35,14 @@ class dmd():
     def __init__(self):
         self.dev=usb.core.find(idVendor=0x0451 ,idProduct=0xc900 )
 
+        for config in self.dev:
+            for i in range(config.bNumInterfaces):
+                if self.dev.is_kernel_driver_active(i):
+                    try:
+                        self.dev.detach_kernel_driver(i)
+                    except usb.core.USBError as e:
+                        sys.exit("Could not detatch kernel driver from interface({0}): {1}".format(i, str(e)))
+
         self.dev.set_configuration()
 
         self.ans=[]
