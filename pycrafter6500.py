@@ -35,6 +35,9 @@ class dmd():
     def __init__(self):
         self.dev=usb.core.find(idVendor=0x0451 ,idProduct=0xc900 )
 
+        if self.dev is None:
+            sys.exit("Could not find any DLP device.")
+
         for config in self.dev:
             for i in range(config.bNumInterfaces):
                 if self.dev.is_kernel_driver_active(i):
