@@ -2,6 +2,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Programs a sequence of images through Texas Instruments' DLPLCRC900EVM evaluation module for DLP displays")
 parser.add_argument("-i", "--images", nargs='+', help="Input images", required=True)
 parser.add_argument("--fps", type=int, default=3)
+parser.add_argument("--avg", action='store_true')
 parser.add_argument("--sum", action='store_true')
 args = parser.parse_args()
 
@@ -19,8 +20,10 @@ dlp_resolution=(1920,1080)
 
 # Load input images
 images=[as_binary_np_array(ImageOps.pad(Image.open(path), size=dlp_resolution, color='black', centering=(0.5, 0.5))) for path in args.images]
-if args.sum:
+if args.avg:
     images=[sum(images)]+[0*images[0] for _ in range(len(images)-1)]
+if args.sum:
+    images=[sum(images)]
 
 # Program the display controller
 dlp=pycrafter6500.dmd()
