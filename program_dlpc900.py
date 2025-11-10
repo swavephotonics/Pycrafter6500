@@ -4,12 +4,13 @@ parser.add_argument("-i", "--images", nargs='+', help="Input images", required=T
 parser.add_argument("--fps", type=int, default=3)
 parser.add_argument("--avg", action='store_true')
 parser.add_argument("--sum", action='store_true')
+parser.add_argument("--dilation", type=int)
 args = parser.parse_args()
 
 
 import pycrafter6500
 import numpy
-from PIL import Image, ImageChops, ImageOps
+from PIL import Image, ImageChops, ImageOps, ImageFilter
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -19,7 +20,10 @@ def as_binary_np_array(image):
 dlp_resolution=(1920,1080)
 
 # Load input images
-images=[as_binary_np_array(ImageOps.pad(Image.open(path), size=dlp_resolution, color='black', centering=(0.5, 0.5))) for path in args.images]
+images=[ImageOps.pad(Image.open(path), size=dlp_resolution, color='black', centering=(0.5, 0.5)) for path in args.images]
+if args.dilation:
+    images=[image.filter(ImageFilter.MaxFilter(args.dilation)) for image in images]
+images=[as_binary_np_array(image) for image in images]
 if args.avg:
     images=[sum(images)]+[0*images[0] for _ in range(len(images)-1)]
 if args.sum:
