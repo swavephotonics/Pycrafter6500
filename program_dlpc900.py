@@ -6,6 +6,8 @@ parser.add_argument("--avg", action='store_true')
 parser.add_argument("--sum", action='store_true')
 parser.add_argument("--temporal_dither", action='store_true')
 parser.add_argument("--dilation", type=int)
+parser.add_argument("--shiftx", type=int, default=0)
+parser.add_argument("--shifty", type=int, default=0)
 args = parser.parse_args()
 
 
@@ -22,7 +24,7 @@ def temporal_dither(image):
 dlp_resolution=(1920,1080)
 
 # Load input images
-images=[ImageOps.pad(Image.open(path).convert('L'), size=dlp_resolution, color='black', centering=(0.5, 0.5)) for path in args.images]
+images=[ImageOps.pad(Image.open(path).convert('L'), size=dlp_resolution, color='black', centering=(args.shiftx/dlp_resolution[0], args.shifty/dlp_resolution[1])) for path in args.images]
 if args.dilation:
     images=[image.filter(ImageFilter.MaxFilter(args.dilation)) for image in images]
 images=[numpy.asarray(image) for image in images]
